@@ -53,7 +53,6 @@ languageRouter
       
       const currentTotal = await LanguageService.getTotalScore(req.app.get('db'), req.language.id)
       const headWord = words.find(w => w.language_id === req.language.id)
-      console.log('currentTotal', currentTotal)
       const wordDetails =  await LanguageService.getWordInfo(req.app.get('db'), headWord.id)
     
       res.json({

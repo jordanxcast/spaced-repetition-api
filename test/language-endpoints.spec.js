@@ -1,7 +1,7 @@
 const app = require('../src/app')
 const helpers = require('./test-helpers')
 
-describe('Language Endpoints', function () {
+describe.only('Language Endpoints', function () {
   let db
 
   const testUsers = helpers.makeUsersArray()
@@ -113,7 +113,7 @@ describe('Language Endpoints', function () {
   describe(`GET /api/language/head`, () => {
     const usersLanguage = testLanguages.find(l => l.user_id === testUser.id)
     const headWord = testWords.find(w => w.language_id === usersLanguage.id)
-
+    
     beforeEach('insert users, languages and words', () => {
       return helpers.seedUsersLanguagesWords(
         db,
@@ -123,7 +123,7 @@ describe('Language Endpoints', function () {
       )
     })
 
-    it.skip(`responds with 200 and user's languages`, () => {
+    it(`responds with 200 and user's languages`, () => {
       return supertest(app)
         .get(`/api/language/head`)
         .set('Authorization', helpers.makeAuthHeader(testUser))

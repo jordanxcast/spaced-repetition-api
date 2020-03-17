@@ -28,6 +28,25 @@ const LanguageService = {
       )
       .where({ language_id })
   },
+
+  getTotalScore(db, id) {
+    return db 
+            .from('language')
+            .select('total_score')
+            .where({ id })
+  },
+
+  getWordInfo(db, id) {
+    return db
+            .from('word')
+            .select(
+                'id',
+                'original',
+                'correct_count',
+                'incorrect_count'
+            )
+            .where({id})
+  }
 }
 
 module.exports = LanguageService

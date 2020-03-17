@@ -9,7 +9,7 @@
     "migrate": "postgrator --config postgrator-config.js",
     "migrate:production": "env SSL=true DATABASE_URL=$(heroku config:get DATABASE_URL) npm run migrate",
     "start": "node src/server.js",
-    "predeploy": "npm audit && npm run migrate:production",
+    "predeploy": "npm run migrate:production", 
     "deploy": "git push heroku master"
   },
   "keywords": [],
@@ -26,6 +26,7 @@
     "helmet": "^3.21.3",
     "jsonwebtoken": "^8.5.0",
     "knex": "^0.20.11",
+    "minimist": "^1.2.5",
     "morgan": "^1.9.1",
     "pg": "^7.8.2"
   },

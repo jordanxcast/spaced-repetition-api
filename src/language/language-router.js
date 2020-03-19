@@ -20,9 +20,8 @@ languageRouter
           error: `You don't have any languages`,
         })
       
-        
-
       req.language = language
+
       const wordList = await LanguageService.getWordList(
         words = await LanguageService.getLanguageWords(
           req.app.get('db'),
@@ -72,7 +71,7 @@ languageRouter
     let memory = wordToCheck.value.memory_value
     const translation = wordToCheck.value.translation
 
-    if(translation === stringToCheck) {  
+    if (translation === stringToCheck) {  
       
       req.list.head = req.list.head.next
       console.log('NEW LIST HEAD', req.list)
@@ -90,11 +89,12 @@ languageRouter
         answer: translation,
         isCorrect: true
       }
+
       console.log('LIST FROM CORRECT', req.list)
       res.json(response)
       
     }
-    else{
+    else {
       memory = 1
 
       req.list.head = req.list.head.next
@@ -113,8 +113,7 @@ languageRouter
         isCorrect: false
       }
       console.log('LIST FROM INCORRECT', req.list)
-      res.json(response)
-      
+      res.json(response) 
     }
     next()
     } catch(error) {
@@ -126,13 +125,13 @@ languageRouter
     .get('/head', async (req, res, next) => {
         try {
           const currentTotal = await LanguageService.getTotalScore(req.app.get('db'), req.language.id)
-          const headWord = req.list.head
+          const headWord = req.list.head.value
 
           res.json({
-            nextWord: headWord.value.original,
-            totalScore: currentTotal[0].total_score,
-            wordCorrectCount: headWord.value.correct_count,
-            wordIncorrectCount: headWord.value.incorrect_count,
+            nextWord: headWord.original,
+            totalScore: currentTotal.total_score,
+            wordCorrectCount: headWord.correct_count,
+            wordIncorrectCount: headWord.incorrect_count,
           })
 
           

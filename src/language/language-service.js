@@ -36,6 +36,7 @@ const LanguageService = {
             .from('language')
             .select('total_score')
             .where({ id })
+            .first()
   },
 
   getWordInfo(db, id) {

@@ -20,8 +20,6 @@ languageRouter
           error: `You don't have any languages`,
         })
       
-        
-
       req.language = language
       const wordList = await LanguageService.getWordList(
         words = await LanguageService.getLanguageWords(

@@ -1,7 +1,7 @@
 const app = require('../src/app')
 const helpers = require('./test-helpers')
 
-describe('Language Endpoints', function () {
+describe.only('Language Endpoints', function () {
   let db
 
   const testUsers = helpers.makeUsersArray()
@@ -113,7 +113,7 @@ describe('Language Endpoints', function () {
   describe(`GET /api/language/head`, () => {
     const usersLanguage = testLanguages.find(l => l.user_id === testUser.id)
     const headWord = testWords.find(w => w.language_id === usersLanguage.id)
-
+    
     beforeEach('insert users, languages and words', () => {
       return helpers.seedUsersLanguagesWords(
         db,
@@ -123,7 +123,7 @@ describe('Language Endpoints', function () {
       )
     })
 
-    it.skip(`responds with 200 and user's languages`, () => {
+    it(`responds with 200 and user's languages`, () => {
       return supertest(app)
         .get(`/api/language/head`)
         .set('Authorization', helpers.makeAuthHeader(testUser))
@@ -140,7 +140,7 @@ describe('Language Endpoints', function () {
   /**
    * @description Submit a new guess for the language
    **/
-  describe(`POST /api/language/guess`, () => {
+  describe.only(`POST /api/language/guess`, () => {
     const [testLanguage] = testLanguages
     const testLanguagesWords = testWords.filter(
       w => w.language_id === testLanguage.id
@@ -155,7 +155,7 @@ describe('Language Endpoints', function () {
       )
     })
 
-    it.skip(`responds with 400 required error when 'guess' is missing`, () => {
+    it(`responds with 400 required error when 'guess' is missing`, () => {
       const postBody = {
         randomField: 'test random field',
       }
@@ -190,7 +190,7 @@ describe('Language Endpoints', function () {
           })
       })
 
-      it.skip(`moves the word 1 space and updates incorrect count`, async () => {
+      it.only(`moves the word 1 space and updates incorrect count`, async () => {
         await supertest(app)
           .post(`/api/language/guess`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
@@ -235,7 +235,7 @@ describe('Language Endpoints', function () {
           })
       })
 
-      it.skip(`moves the word 2 spaces, increases score and correct count`, async () => {
+      it(`moves the word 2 spaces, increases score and correct count`, async () => {
         let correctPostBody = {
           guess: testLanguagesWords[0].translation,
         }

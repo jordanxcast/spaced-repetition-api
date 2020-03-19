@@ -56,7 +56,7 @@ const LanguageService = {
   getWordList(words) {
     const wordList = new LinkedList()
   
-    words.forEach(word => wordList.insertLast(word.original))
+    words.forEach(word => wordList.insertLast(word))
 
     return wordList
   }

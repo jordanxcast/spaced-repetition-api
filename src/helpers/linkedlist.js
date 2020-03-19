@@ -1,3 +1,5 @@
+const LanguageService = require('../language/language-service')
+
 class _Node {
     constructor(value, next) {
         this.value=value,

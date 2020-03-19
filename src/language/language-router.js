@@ -19,8 +19,17 @@ languageRouter
         return res.status(404).json({
           error: `You don't have any languages`,
         })
+      
+        
 
       req.language = language
+      const wordList = await LanguageService.getWordList(
+        words = await LanguageService.getLanguageWords(
+          req.app.get('db'),
+          req.language.id,
+        )
+      )
+      req.list = wordList
       next()
     } catch (error) {
       next(error)
@@ -46,41 +55,11 @@ languageRouter
   })
 
 languageRouter
-  .get('/head', async (req, res, next) => {
-    try {
-      const words = await LanguageService.getLanguageWords(
-        req.app.get('db'),
-        req.language.id,
-      )
-
-      const wordList = new LinkedList()
-
-      words.forEach(word => wordList.insertLast(word.original))
-      console.log(wordList)
-      
-      const currentTotal = await LanguageService.getTotalScore(req.app.get('db'), req.language.id)
-      const headWord = words.find(w => w.language_id === req.language.id)
-      const wordDetails =  await LanguageService.getWordInfo(req.app.get('db'), headWord.id)
-    
-      res.json({
-        nextWord: wordDetails[0].original,
-        totalScore: currentTotal[0].total_score,
-        wordCorrectCount: wordDetails[0].correct_count,
-        wordIncorrectCount: wordDetails[0].incorrect_count,
-      })
-      next()
-    }catch (error) {
-      next(error)
-    }
-  })
-
-languageRouter
   .post('/guess', bodyParser, async (req, res, next) => {
 
     try {
-    const {guess, id} = req.body
+    const {guess} = req.body
     const stringToCheck = guess
-    const wordId = id
 
     if(!guess) {
       return res.status(400).json({
@@ -88,34 +67,79 @@ languageRouter
       })
     }
 
-    const list = await LanguageService.getWordList(
-      words = await LanguageService.getLanguageWords(
-        req.app.get('db'),
-        req.language.id,
-      )
-    )
-      
-    const wordToCheck = await LanguageService.getWordInfo(
-      req.app.get('db'),
-      wordId,
-    )
+    const wordToCheck = req.list.head
 
-    if(wordToCheck[0].translation === stringToCheck) {  
-      list.head = list.head.next
-      list.insertAt(2, wordToCheck[0].original)
-      console.log('list', list)
+    let memory = wordToCheck.value.memory_value
+    const translation = wordToCheck.value.translation
+
+    if(translation === stringToCheck) {  
+      
+      req.list.head = req.list.head.next
+      console.log('NEW LIST HEAD', req.list)
+      memory = memory * 2
+
+      wordToCheck.value.memory_value = memory
+
+      req.list.insertAt(memory, wordToCheck)
+
+      const response = {
+        nextWord: req.list.head.value.original,
+        totalScore: req.language.total_score + 1,
+        wordCorrectCount: wordToCheck.value.correct_count + 1,
+        wordIncorrectCount: wordToCheck.value.incorrect_count,
+        answer: translation,
+        isCorrect: true
+      }
+      console.log('LIST FROM CORRECT', req.list)
+      res.json(response)
+      
     }
     else{
-      list.head = list.head.next
-      list.insertAt(1, wordToCheck[0].original)
-      console.log('list', list)
-    }
+      memory = 1
 
-    res.send('implement me')
+      req.list.head = req.list.head.next
+      console.log('NEW LIST HEAD', req.list)
+
+      wordToCheck.value.memory_value = memory
+
+      req.list.insertAt(memory, wordToCheck)
+
+      const response = {
+        nextWord: req.list.head.value.original,
+        totalScore: req.language.total_score,
+        wordCorrectCount: wordToCheck.value.correct_count,
+        wordIncorrectCount: wordToCheck.value.incorrect_count + 1,
+        answer: translation,
+        isCorrect: false
+      }
+      console.log('LIST FROM INCORRECT', req.list)
+      res.json(response)
+      
     }
-    catch(error) {
+    next()
+    } catch(error) {
       next(error)
     }
   })
+
+  languageRouter
+    .get('/head', async (req, res, next) => {
+        try {
+          const currentTotal = await LanguageService.getTotalScore(req.app.get('db'), req.language.id)
+          const headWord = req.list.head
+
+          res.json({
+            nextWord: headWord.value.original,
+            totalScore: currentTotal[0].total_score,
+            wordCorrectCount: headWord.value.correct_count,
+            wordIncorrectCount: headWord.value.incorrect_count,
+          })
+
+          
+          next()
+        }catch (error) {
+          next(error)
+        }
+    })
 
 module.exports = languageRouter

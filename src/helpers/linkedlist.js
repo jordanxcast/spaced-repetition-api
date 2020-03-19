@@ -24,7 +24,10 @@ class LinkedList {
       while(tempNode.next !== null){
         tempNode = tempNode.next;
       }
-      tempNode.next = new _Node(item, null);
+      const insertedNode = new _Node(item, null)
+      tempNode.value.next = insertedNode.value.id
+      tempNode.next = insertedNode
+
     }
   }
   insertAt(nthPosition, itemToInsert) {
@@ -40,7 +43,7 @@ class LinkedList {
       newNode.next = node.next; 
       newNode.value.next = node.next.value.id,
       node.next = newNode;
-      //   console.log('newNode', newNode);
+
       return newNode;
     }
   }

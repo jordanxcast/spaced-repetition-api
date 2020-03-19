@@ -31,6 +31,23 @@ const LanguageService = {
       .where({ language_id })
   },
 
+  getLanguageWordsByNext(db, language_id) {
+    return db
+      .from('word')
+      .select(
+        'id',
+        'language_id',
+        'original',
+        'translation',
+        'next',
+        'memory_value',
+        'correct_count',
+        'incorrect_count',
+      )
+      .where({ language_id })
+      .orderBy('next')
+  },
+
   getTotalScore(db, id) {
     return db 
             .from('language')

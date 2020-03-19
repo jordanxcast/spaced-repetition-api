@@ -21,15 +21,7 @@ languageRouter
         })
       
       req.language = language
-      const wordList = await LanguageService.getWordList(
-        words = await LanguageService.getLanguageWords(
-          req.app.get('db'),
-          req.language.id,
-        )
-      )
 
-      console.log('WORD LIST!!', JSON.stringify(wordList) )
-      req.list = wordList
       next()
     } catch (error) {
       next(error)
@@ -62,6 +54,21 @@ languageRouter
     const {guess} = req.body
     const stringToCheck = guess
 
+    const words = await LanguageService.getLanguageWords(
+      req.app.get('db'),
+      req.language.id,
+    )
+
+    console.log('WORDS ARRAY', words)
+    console.log('    ')
+
+    const wordList = await LanguageService.getWordList(
+      words
+    )
+
+    console.log('WORD LIST START', JSON.stringify(wordList))
+    console.log('    ')
+
     //check it there is no guess in the body
     if(!guess) {
       return res.status(400).json({
@@ -70,7 +77,7 @@ languageRouter
     }
 
     //set a variable to the head node of the LL to check the guess against
-    const wordToCheck = req.list.head
+    const wordToCheck = wordList.head //pull from db
 
     //memory value of the word to check 
     let memory = wordToCheck.value.memory_value
@@ -79,29 +86,28 @@ languageRouter
 
     if(translation === stringToCheck) {  
       
-      req.list.head = req.list.head.next
-      console.log('NEW LIST HEAD', req.list)
+      wordList.head = wordList.head.next
+  
       memory = memory * 2
 
       wordToCheck.value.memory_value = memory;
       wordToCheck.value.correct_count = wordToCheck.value.correct_count + 1;
 
-      req.list.insertAt(memory, wordToCheck.value)
+      wordList.insertAt(memory, wordToCheck.value)
 
-      const prevNode = req.list._findNthElement(memory-1)
-      console.log(prevNode, 'Previous Node')
-      const newNode = req.list._findNthElement(memory)
-      console.log(newNode, 'New Node')
+      const prevNode = wordList._findNthElement(memory-1)
+      // console.log(prevNode, 'Previous Node')
+      const newNode = wordList._findNthElement(memory)
+      // console.log(newNode, 'New Node')
 
       const response = {
-        nextWord: req.list.head.value.original,
+        nextWord: wordList.head.value.original,
         totalScore: req.language.total_score + 1,
         wordCorrectCount: wordToCheck.value.correct_count,
         wordIncorrectCount: wordToCheck.value.incorrect_count,
         answer: translation,
         isCorrect: true
       }
-      // console.log('LIST FROM CORRECT', req.list)
 
       const newNext = newNode.next.value.id ? newNode.next.value.id : null
       //update the correct word in the database 
@@ -126,36 +132,37 @@ languageRouter
         req.language.id,
         //how to increment the total score ?
         req.language.total_score + 1,
-        req.list.head.value.id
+        wordList.head.value.id
       )
 
+
+
       res.json(response)
-      
+      console.log('WORD LIST AFTER CORRECT', JSON.stringify(wordList))
     }
+
     else{
       memory = 1
       
 
-      req.list.head = req.list.head.next
-      console.log('NEW LIST HEAD', req.list)
+      wordList.head = wordList.head.next
 
       wordToCheck.value.memory_value = memory
       wordToCheck.value.incorrect_count = wordToCheck.value.incorrect_count + 1;
 
-      req.list.insertAt(memory, wordToCheck.value)
+      wordList.insertAt(memory, wordToCheck.value)
 
-      const prevNode = req.list._findNthElement(memory)
-      const newNode = req.list._findNthElement(memory+1)
+      const prevNode = wordList._findNthElement(memory)
+      const newNode = wordList._findNthElement(memory+1)
 
       const response = {
-        nextWord: req.list.head.value.original,
+        nextWord: wordList.head.value.original,
         totalScore: req.language.total_score,
         wordCorrectCount: wordToCheck.value.correct_count,
         wordIncorrectCount: wordToCheck.value.incorrect_count,
         answer: translation,
         isCorrect: false
       }
-      console.log('LIST FROM INCORRECT', req.list)
 
       const newNext = newNode.next.value.id ? newNode.next.value.id : null
 
@@ -178,8 +185,10 @@ languageRouter
         req.app.get('db'),
         req.language.id,
         req.language.total_score,
-        req.list.head.value.id
+        wordList.head.value.id
       )
+
+      console.log('WORD LIST AFTER INCORRECT', JSON.stringify(wordList))
       res.json(response)
       
     }
@@ -220,25 +229,6 @@ languageRouter
         next(error)
       }
       
-
-//--------------------------------------------------------------
-        
-        // try {
-        //   const currentTotal = await LanguageService.getTotalScore(req.app.get('db'), req.language.id)
-        //   const headWord = req.list.head
-
-        //   res.json({
-        //     nextWord: headWord.value.original,
-        //     totalScore: currentTotal.total_score,
-        //     wordCorrectCount: headWord.value.correct_count,
-        //     wordIncorrectCount: headWord.value.incorrect_count,
-        //   })
-
-          
-        //   next()
-        // }catch (error) {
-        //   next(error)
-        // }
     })
 
 module.exports = languageRouter

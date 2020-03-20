@@ -54,29 +54,29 @@ languageRouter
     const {guess} = req.body
     const stringToCheck = guess
 
+    //find the word set as the head in language table so that it'll be inserted into the ll first
     const headId = await LanguageService.getHeadId(
       req.app.get('db'), req.language.id
     )
     const headWord = await LanguageService.getWordInfo(
       req.app.get('db'), headId.head
     )
-
+    
+    //retrieves all other words besides the designated head word, ordered by their "next" attribute
     const otherWordsArr = await LanguageService.getLanguageWords2(
       req.app.get('db'), headId.head
     )
 
-    //console.log(otherWordsArr, 'other words array')
+    //inserts head word and otherWordsArr into another array
     const wordsArr = await LanguageService.populateArr(
       req.app.get('db'),
       headWord, 
       otherWordsArr)
 
+    //sends wordsArr and constructs linked list that is used to determine the word order
     const wordList = await LanguageService.getWordList(
       wordsArr
     )
-
-   // console.log('WORD LIST START', JSON.stringify(wordList))
-    console.log('    ')
 
     //check it there is no guess in the body
     if(!guess) {
@@ -93,6 +93,7 @@ languageRouter
     //translation of the word to check
     const translation = wordToCheck.value.translation
 
+    //if user's guess is correct, move word in linked list by its memory value * 2 and update db accordingly
     if(translation === stringToCheck) {
       wordList.head = wordList.head.next
   
@@ -146,9 +147,9 @@ languageRouter
 
 
       res.json(response)
-      console.log('WORD LIST AFTER CORRECT', JSON.stringify(wordList))
     }
 
+    //if user's guess is incorrect, reset word's memory value to 1, move it back in list by 1, and update db accordingly
     else{
       memory = 1
       
@@ -196,9 +197,7 @@ languageRouter
         wordList.head.value.id
       )
 
-      console.log('WORD LIST AFTER INCORRECT', JSON.stringify(wordList))
       res.json(response)
-      
     }
     next()
     } catch(error) {
@@ -209,7 +208,6 @@ languageRouter
   languageRouter
     .get('/head', async (req, res, next) => {
 
-      //all outside of the try block for now for us to test the below (getting the head node form the db instead from the LL)
       try {
         const currentTotal = await LanguageService.getTotalScore(req.app.get('db'), req.language.id)
 

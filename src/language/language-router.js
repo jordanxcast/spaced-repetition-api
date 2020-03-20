@@ -54,16 +54,33 @@ languageRouter
     const {guess} = req.body
     const stringToCheck = guess
 
+    const headId = await LanguageService.getHeadId(
+      req.app.get('db'), req.language.id
+    )
+    const headWord = await LanguageService.getWordInfo(
+      req.app.get('db'), headId.head
+    )
+
+    const otherWordsArr = await LanguageService.getLanguageWords2(
+      req.app.get('db'), headId.head
+    )
+
+    console.log(otherWordsArr, 'other words array')
+    const wordsArr = await LanguageService.populateArr(
+      req.app.get('db'),
+      headWord, 
+      otherWordsArr)
+
     const words = await LanguageService.getLanguageWords(
       req.app.get('db'),
       req.language.id,
     )
 
-    console.log('WORDS ARRAY', words)
+    // console.log('WORDS ARRAY', wordsArr)
     console.log('    ')
 
     const wordList = await LanguageService.getWordList(
-      words
+      wordsArr
     )
 
     console.log('WORD LIST START', JSON.stringify(wordList))

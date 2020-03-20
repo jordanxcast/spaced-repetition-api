@@ -31,6 +31,23 @@ const LanguageService = {
       .where({ language_id })
   },
 
+  getLanguageWords2(db, headId) {
+    return db
+      .from('word')
+      .whereNot({ id: headId })
+      .select(
+        'id',
+        'language_id',
+        'original',
+        'translation',
+        'next',
+        'memory_value',
+        'correct_count',
+        'incorrect_count',
+      ) 
+      .orderBy('id')
+  },
+
   getLanguageWordsByNext(db, language_id) {
     return db
       .from('word')
@@ -76,6 +93,42 @@ const LanguageService = {
     const wordList = new LinkedList()
     words.forEach(word => wordList.insertLast(word))
     return wordList
+  },
+
+  // getWordList2(db, headId, headWord){
+  //   const wordList2 = new LinkedList()
+  //   let wordArr = [];
+  //   wordArr.push(headWord);
+  
+  //   const otherWords = this.getLanguageWords2(db, headId)
+
+  //   return wordList2;
+  // },
+
+  async populateArr (db, headWord, otherWords){
+    const finalArr =[];
+    finalArr.push(headWord);
+    for(let i=0; i<otherWords.length-1; i++) {
+      if(i === 0){
+        finalArr.push(otherWords[i])
+      }
+      const nextWord = await this.getNextWord(db, otherWords[i])
+      finalArr.push(nextWord)
+    }
+    console.log(finalArr, 'final arr')
+    return finalArr;
+  },
+
+  getNextWord(db, currWord){
+    console.log(currWord, 'current word')
+    while(currWord.next !== null){
+      const nextId = currWord.next
+      return db('word')
+        .select('*')
+        .where({id: nextId})
+        .first()
+    }
+    return;
   },
 
   updateLanguage(db, langId, totalScore, newHeadId){
@@ -125,22 +178,6 @@ const LanguageService = {
       .where({id: langId})
       .first()
   },
-
-
-  //same as getWordInfo above so not needed 
-  // getHeadWord(db, id) {
-  //   return db
-  //     .select(
-  //       'id',
-  //       'original',
-  //       'translation',
-  //       'next',
-  //       'memory_value',
-  //       'correct_count',
-  //       'incorrect_count',
-  //     )
-  //     .where({id})
-  // } 
 
 }
 

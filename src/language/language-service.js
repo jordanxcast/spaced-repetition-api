@@ -45,7 +45,7 @@ const LanguageService = {
         'correct_count',
         'incorrect_count',
       ) 
-      .orderBy('id')
+      .orderBy('next')
   },
 
   getLanguageWordsByNext(db, language_id) {
@@ -95,16 +95,6 @@ const LanguageService = {
     return wordList
   },
 
-  // getWordList2(db, headId, headWord){
-  //   const wordList2 = new LinkedList()
-  //   let wordArr = [];
-  //   wordArr.push(headWord);
-  
-  //   const otherWords = this.getLanguageWords2(db, headId)
-
-  //   return wordList2;
-  // },
-
   async populateArr (db, headWord, otherWords){
     const finalArr =[];
     finalArr.push(headWord);
@@ -120,7 +110,6 @@ const LanguageService = {
   },
 
   getNextWord(db, currWord){
-    console.log(currWord, 'current word')
     while(currWord.next !== null){
       const nextId = currWord.next
       return db('word')

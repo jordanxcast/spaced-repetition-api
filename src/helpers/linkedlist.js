@@ -47,23 +47,7 @@ class LinkedList {
       return newNode;
     }
   }
-
-  // insertWords(item) {
-  //   if(this.head === null){
-  //     this.insertFirst(item);
-  //   }
-
-    
-  //   for(let i = 0; i <=10; i++) {
-  //     let tempNode = this.head;
-  //     if(tempNode.value.next === item.id) {
-  //       const newNode = new _Node(item, null);
-  //       newNode.next = tempNode.next;
-  //       tempNode.next = newNode;
-  //       tempNode = tempNode.next;
-  //     }
-  //   }
-  // }
+  
   _findNthElement(position) {
     let node = this.head;
     for (let i=0; i<position; i++) {

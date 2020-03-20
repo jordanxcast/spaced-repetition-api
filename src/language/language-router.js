@@ -65,25 +65,17 @@ languageRouter
       req.app.get('db'), headId.head
     )
 
-    console.log(otherWordsArr, 'other words array')
+    //console.log(otherWordsArr, 'other words array')
     const wordsArr = await LanguageService.populateArr(
       req.app.get('db'),
       headWord, 
       otherWordsArr)
 
-    const words = await LanguageService.getLanguageWords(
-      req.app.get('db'),
-      req.language.id,
-    )
-
-    // console.log('WORDS ARRAY', wordsArr)
-    console.log('    ')
-
     const wordList = await LanguageService.getWordList(
       wordsArr
     )
 
-    console.log('WORD LIST START', JSON.stringify(wordList))
+   // console.log('WORD LIST START', JSON.stringify(wordList))
     console.log('    ')
 
     //check it there is no guess in the body
@@ -101,8 +93,7 @@ languageRouter
     //translation of the word to check
     const translation = wordToCheck.value.translation
 
-    if(translation === stringToCheck) {  
-      
+    if(translation === stringToCheck) {
       wordList.head = wordList.head.next
   
       memory = memory * 2
@@ -113,9 +104,8 @@ languageRouter
       wordList.insertAt(memory, wordToCheck.value)
 
       const prevNode = wordList._findNthElement(memory-1)
-      // console.log(prevNode, 'Previous Node')
+      
       const newNode = wordList._findNthElement(memory)
-      // console.log(newNode, 'New Node')
 
       const response = {
         nextWord: wordList.head.value.original,
@@ -127,6 +117,7 @@ languageRouter
       }
 
       const newNext = newNode.next.value.id ? newNode.next.value.id : null
+      
       //update the correct word in the database 
       LanguageService.updateCorrectWord(
         req.app.get('db'),

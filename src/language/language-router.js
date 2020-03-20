@@ -214,13 +214,11 @@ languageRouter
       const headId = await LanguageService.getHeadId(
         req.app.get('db'),
         req.language.id)
-      console.log(headId, 'headId')
         
       const headWord = await LanguageService.getWordInfo(
         req.app.get('db'),
         headId.head)
-      console.log(headWord, 'head word')
-
+      
         res
           .status(200)
           .json({

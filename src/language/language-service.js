@@ -105,7 +105,6 @@ const LanguageService = {
       const nextWord = await this.getNextWord(db, otherWords[i])
       finalArr.push(nextWord)
     }
-    console.log(finalArr, 'final arr')
     return finalArr;
   },
 

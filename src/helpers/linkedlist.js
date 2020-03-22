@@ -16,7 +16,6 @@ class LinkedList {
     this.head = new _Node(item, this.head);
   }
   insertLast(item){
-    console.log('item in insert last', item);
     if(this.head === null){
       this.insertFirst(item);
     }

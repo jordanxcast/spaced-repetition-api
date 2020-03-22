@@ -66,14 +66,12 @@ languageRouter
     const otherWordsArr = await LanguageService.getLanguageWords2(
       req.app.get('db'), headId.head
     )
-    console.log(otherWordsArr, 'words from db')
 
     //inserts head word and otherWordsArr into another array
     const wordsArr = await LanguageService.populateArr(
       req.app.get('db'),
       headWord, 
       otherWordsArr)
-    console.log(wordsArr, ' words arr')
 
     //sends wordsArr and constructs linked list that is used to determine the word order
     const wordList = await LanguageService.getWordList(

@@ -24,10 +24,9 @@ class LinkedList {
       while(tempNode.next !== null){
         tempNode = tempNode.next;
       }
-      const insertedNode = new _Node(item, null)
-      tempNode.value.next = insertedNode.value.id
-      tempNode.next = insertedNode
-
+      const insertedNode = new _Node(item, null);
+      tempNode.value.next = insertedNode.value.id;
+      tempNode.next = insertedNode;
     }
   }
   insertAt(nthPosition, itemToInsert) {

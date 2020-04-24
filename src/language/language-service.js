@@ -103,7 +103,9 @@ const LanguageService = {
         finalArr.push(otherWords[i])
       }
       const nextWord = await this.getNextWord(db, otherWords[i])
-      finalArr.push(nextWord)
+      if(nextWord !== undefined){
+        finalArr.push(nextWord)
+      }
     }
     return finalArr;
   },
